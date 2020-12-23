@@ -1,0 +1,11 @@
+{
+  "name": "first_exercise",
+  "version": "1.0.0",
+  "description": "some of the basic programs",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Prince Amit",
+  "license": "MIT"
+}

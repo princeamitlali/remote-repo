@@ -1,0 +1,244 @@
+//it is used to filter data to remove duplication it acts on multiple model
+// there are three ways for agrregation
+
+//aggregation pipeline
+this arrrange data one under another first it filter data and then group them to remove duplication
+
+//mapreduce
+//it use mapping and grouping of data
+
+//single purpose
+// it works as the distinct keyword of the mysql
+
+> show dbs
+admin      0.000GB
+config     0.000GB
+inventory  0.000GB
+local      0.000GB
+test       0.000GB
+
+
+> use inventory
+switched to db inventory
+> db.orders.insertMany([{cust_id:1,"qty":2,"amount":200},{cust_id:2,"qty":2,"amount":300},{cust_id:1,"qty":1,"amount":400},{cust_id:2,"qty":1,"amount":400},{cust_id:1,"qty":2,"amount":200},])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5fe1f7a11fd2da2911d4bbb5"),
+                ObjectId("5fe1f7a11fd2da2911d4bbb6"),
+                ObjectId("5fe1f7a11fd2da2911d4bbb7"),
+                ObjectId("5fe1f7a11fd2da2911d4bbb8"),
+                ObjectId("5fe1f7a11fd2da2911d4bbb9")
+        ]
+}
+> db.orders.find()
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb5"), "cust_id" : 1, "qty" : 2, "amount" : 200 }
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb6"), "cust_id" : 2, "qty" : 2, "amount" : 300 }
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb7"), "cust_id" : 1, "qty" : 1, "amount" : 400 }
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb8"), "cust_id" : 2, "qty" : 1, "amount" : 400 }
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb9"), "cust_id" : 1, "qty" : 2, "amount" : 200 }
+> db.orders.find().pretty()
+{
+        "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb5"),
+        "cust_id" : 1,
+        "qty" : 2,
+        "amount" : 200
+}
+{
+        "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb6"),
+        "cust_id" : 2,
+        "qty" : 2,
+        "amount" : 300
+}
+{
+        "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb7"),
+        "cust_id" : 1,
+        "qty" : 1,
+        "amount" : 400
+}
+{
+        "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb8"),
+        "cust_id" : 2,
+        "qty" : 1,
+        "amount" : 400
+}
+{
+        "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb9"),
+        "cust_id" : 1,
+        "qty" : 2,
+        "amount" : 200
+}
+
+
+//example of aggregate pipeline
+> db.orders.aggregate([ {$match : { 'cust_id':1}}, {$group: {'_id':'cust_id',total:{$sum:'$amount'}}}])
+{ "_id" : "cust_id", "total" : 800 }
+>
+>
+>
+> db.orders.find()
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb5"), "cust_id" : 1, "qty" : 2, "amount" : 200 }
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb6"), "cust_id" : 2, "qty" : 2, "amount" : 300 }
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb7"), "cust_id" : 1, "qty" : 1, "amount" : 400 }
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb8"), "cust_id" : 2, "qty" : 1, "amount" : 400 }
+{ "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb9"), "cust_id" : 1, "qty" : 2, "amount" : 200 }
+>
+
+
+//example of single purpose
+> db.orders.distinct("cust_id")
+[ 1, 2 ]
+> db.orders.distinct("amount")
+[ 200, 300, 400 ]
+>
+>
+>
+
+//when we want to select only some specific columns
+// like in mysql selct item,qty,size from inventory
+
+>
+//you can either use either 0 or 1 for parameters field where 1 means need to include and 0 means exclude
+> db.inventory.aggregate([{$project:{"item":1,"qty":1}}])
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100 }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25 }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85 }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25 }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100 }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75 }
+
+//you can use 0 with id as it is universal so works with 0 also
+> db.inventory.aggregate([{$project:{'_id':0,"item":1,"qty":1}}]).pretty()
+{ "item" : "canvas", "qty" : 100 }
+{ "item" : "journal", "qty" : 25 }
+{ "item" : "mat", "qty" : 85 }
+{ "item" : "mousepad", "qty" : 25 }
+{ "item" : "paper", "qty" : 100 }
+{ "item" : "planner", "qty" : 75 }
+>
+>
+
+> db.inventory.aggregate([{$project:{'_id':0,"size":0,"tags":0}}]).pretty()
+{ "item" : "canvas", "qty" : 100 }
+{ "item" : "journal", "qty" : 25 }
+{ "item" : "mat", "qty" : 85 }
+{ "item" : "mousepad", "qty" : 25 }
+{ "item" : "paper", "qty" : 100, "status" : "D" }
+{ "item" : "planner", "qty" : 75, "status" : "D" }
+>
+
+
+//alternage of $project
+
+> db.inventory.find({},{'_id':0,"item":1,"qty":1}).pretty()
+{ "item" : "canvas", "qty" : 100 }
+{ "item" : "journal", "qty" : 25 }
+{ "item" : "mat", "qty" : 85 }
+{ "item" : "mousepad", "qty" : 25 }
+{ "item" : "paper", "qty" : 100 }
+{ "item" : "planner", "qty" : 75 }
+>
+>
+>
+
+> db.bill.insertMany([ {"cust_id":1,"pay":200,"qty":2,"due":2},{"cust_id":2,"pay":200,"qty":3,"due":3},{"cust_id":1,"pay":300,"qty":2,"due":1},{"cust_id":2,"pay":300,"qty":1,"due":4},{"cust_id":1,"pay":200,"qty":2,"due":2},])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5fe202331fd2da2911d4bbba"),
+                ObjectId("5fe202331fd2da2911d4bbbb"),
+                ObjectId("5fe202331fd2da2911d4bbbc"),
+                ObjectId("5fe202331fd2da2911d4bbbd"),
+                ObjectId("5fe202331fd2da2911d4bbbe")
+        ]
+}
+> db.bill.find()
+{ "_id" : ObjectId("5fe202331fd2da2911d4bbba"), "cust_id" : 1, "pay" : 200, "qty" : 2, "due" : 2 }
+{ "_id" : ObjectId("5fe202331fd2da2911d4bbbb"), "cust_id" : 2, "pay" : 200, "qty" : 3, "due" : 3 }
+{ "_id" : ObjectId("5fe202331fd2da2911d4bbbc"), "cust_id" : 1, "pay" : 300, "qty" : 2, "due" : 1 }
+{ "_id" : ObjectId("5fe202331fd2da2911d4bbbd"), "cust_id" : 2, "pay" : 300, "qty" : 1, "due" : 4 }
+{ "_id" : ObjectId("5fe202331fd2da2911d4bbbe"), "cust_id" : 1, "pay" : 200, "qty" : 2, "due" : 2 }
+>
+>
+
+
+//use of lookup similar as join
+//order is the local model
+//bill is the foreign model
+//localField and foreignField are the column on which we are applying the joints
+//as works as a temprory holder to hold the data if the query executed
+
+> db.orders.aggregate([ {$match:{"cust_id":1}}, {$lookup:{from:"bill",localField:"qty",foreignField:"qty",as:"quantity"}}]).pretty()
+{
+        "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb5"),
+        "cust_id" : 1,
+        "qty" : 2,
+        "amount" : 200,
+        "quantity" : [
+                {
+                        "_id" : ObjectId("5fe202331fd2da2911d4bbba"),
+                        "cust_id" : 1,
+                        "pay" : 200,
+                        "qty" : 2,
+                        "due" : 2
+                },
+                {
+                        "_id" : ObjectId("5fe202331fd2da2911d4bbbc"),
+                        "cust_id" : 1,
+                        "pay" : 300,
+                        "qty" : 2,
+                        "due" : 1
+                },
+                {
+                        "_id" : ObjectId("5fe202331fd2da2911d4bbbe"),
+                        "cust_id" : 1,
+                        "pay" : 200,
+                        "qty" : 2,
+                        "due" : 2
+                }
+        ]
+}
+{
+        "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb7"),
+        "cust_id" : 1,
+        "qty" : 1,
+        "amount" : 400,
+        "quantity" : [
+                {
+                        "_id" : ObjectId("5fe202331fd2da2911d4bbbd"),
+                        "cust_id" : 2,
+                        "pay" : 300,
+                        "qty" : 1,
+                        "due" : 4
+                }
+        ]
+}
+{
+        "_id" : ObjectId("5fe1f7a11fd2da2911d4bbb9"),
+        "cust_id" : 1,
+        "qty" : 2,
+        "amount" : 200,
+        "quantity" : [
+                {
+                        "_id" : ObjectId("5fe202331fd2da2911d4bbba"),
+                        "cust_id" : 1,
+                        "pay" : 200,
+                        "qty" : 2,
+                        "due" : 2
+                },
+                {
+                        "_id" : ObjectId("5fe202331fd2da2911d4bbbc"),
+                        "cust_id" : 1,
+                        "pay" : 300,
+                        "qty" : 2,
+                        "due" : 1
+                },
+                {
+                        "_id" : ObjectId("5fe202331fd2da2911d4bbbe"),
+                        "cust_id" : 1,
+                        "pay" : 200,
+                        "qty" : 2,
+                        "due" : 2
+                }
+        ]
+}

@@ -1,0 +1,21 @@
+//first of all install express generator
+
+npm install -g express generator
+
+//verify 
+
+express
+
+express -truncatechars_html
+
+//using express generator to create an skelton
+
+express --view="pug/ejs or any format you want" "name of app"
+
+// you need to install all required packages
+
+npm install
+
+//runing app
+
+$env:DEBUG='name_of_app:*'; npm start
