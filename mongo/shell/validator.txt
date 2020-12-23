@@ -1,0 +1,202 @@
+//data models
+//data models refers to the way in which your data are stored
+//there are two types of data models
+// embedded
+//in embedded model whole data are stored in a single collection and divide the collectio to sub collection or embedded sub document 
+whole data is divided homogenously in the same collection 
+this is not success when any particular field value is repeated continously like a same customer can order various items
+
+Normalized
+it is the by default model in this each sub document is an individual collection while there is a primary collection having an unique index 
+for all other collection the unique index of the primary collection act as a foreign key
+
+
+validation
+we need to validate data entered in the schema in order to verify that the correct data is entered
+
+
+// the validator is created with validator object
+// schema is defined in the json format while the datatype is in the bson format
+// the required field is cumpolsary to enter 
+//property defines the meta data of each column
+
+> db.createCollection("students", {
+...    validator: {
+...       $jsonSchema: {
+...          bsonType: "object",
+...          required: [ "name", "year", "major", "address" ],
+...          properties: {
+...             name: {
+...                bsonType: "string",
+...                description: "must be a string and is required"
+...             },
+...             year: {
+...                bsonType: "int",
+...                minimum: 2017,
+...                maximum: 3017,
+...                description: "must be an integer in [ 2017, 3017 ] and is required"
+...             },
+...             major: {
+...                enum: [ "Math", "English", "Computer Science", "History", null ],
+...                description: "can only be one of the enum values and is required"
+...             },
+...             gpa: {
+...                bsonType: [ "double" ],
+...                description: "must be a double if the field exists"
+...             },
+...             address: {
+...                bsonType: "object",
+...                required: [ "city" ],
+...                properties: {
+...                   street: {
+...                      bsonType: "string",
+...                      description: "must be a string if the field exists"
+...                   },
+...                   city: {
+...                      bsonType: "string",
+...                      description: "must be a string and is required"
+...                   }
+...                }
+...             }
+...          }
+...       }
+...    }
+... })
+{ "ok" : 1 }
+>
+
+//validation fail as you have to type cast the numbers explicitly
+
+> db.students.insertOne( { "name":"prince amit", "year":2019, "major":"computer science", "gpa":8.2, "address":{ "city":"bihar sharif", "street":"habibpura"} })
+WriteError({
+        "index" : 0,
+        "code" : 121,
+        "errmsg" : "Document failed validation",
+        "op" : {
+                "_id" : ObjectId("5fe2c855e5ca4e5cea31e4ad"),
+                "name" : "prince amit",
+                "year" : 2019,
+                "major" : "computer science",
+                "gpa" : 8.2,
+                "address" : {
+                        "city" : "bihar sharif",
+                        "street" : "habibpura"
+                }
+        }
+}) :
+WriteError({
+        "index" : 0,
+        "code" : 121,
+        "errmsg" : "Document failed validation",
+        "op" : {
+                "_id" : ObjectId("5fe2c855e5ca4e5cea31e4ad"),
+                "name" : "prince amit",
+                "year" : 2019,
+                "major" : "computer science",
+                "gpa" : 8.2,
+                "address" : {
+                        "city" : "bihar sharif",
+                        "street" : "habibpura"
+                }
+        }
+})
+WriteError@src/mongo/shell/bulk_api.js:458:48
+mergeBatchResults@src/mongo/shell/bulk_api.js:855:49
+executeBatch@src/mongo/shell/bulk_api.js:919:13
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1163:21
+DBCollection.prototype.insertOne@src/mongo/shell/crud_api.js:264:9
+@(shell):1:1
+>
+
+
+
+// validation fails as major defin as enum and the data we ntered is in small but in enum that is in the camel case 
+
+> db.students.insertOne( { "name":"prince amit", "year":numberInt(2019), "major":"computer science", "gpa":8.2, "address":{ "city":"bihar sharif", "street":"habibpura"} })
+uncaught exception: ReferenceError: numberInt is not defined :
+@(shell):1:48
+> db.students.insertOne( { "name":"prince amit", "year":NumberInt(2019), "major":"computer science", "gpa":8.2, "address":{ "city":"bihar sharif", "street":"habibpura"} })
+WriteError({
+        "index" : 0,
+        "code" : 121,
+        "errmsg" : "Document failed validation",
+        "op" : {
+                "_id" : ObjectId("5fe2c8b0e5ca4e5cea31e4ae"),
+                "name" : "prince amit",
+                "year" : NumberInt(2019),
+                "major" : "computer science",
+                "gpa" : 8.2,
+                "address" : {
+                        "city" : "bihar sharif",
+                        "street" : "habibpura"
+                }
+        }
+}) :
+WriteError({
+        "index" : 0,
+        "code" : 121,
+        "errmsg" : "Document failed validation",
+        "op" : {
+                "_id" : ObjectId("5fe2c8b0e5ca4e5cea31e4ae"),
+                "name" : "prince amit",
+                "year" : NumberInt(2019),
+                "major" : "computer science",
+                "gpa" : 8.2,
+                "address" : {
+                        "city" : "bihar sharif",
+                        "street" : "habibpura"
+                }
+        }
+})
+WriteError@src/mongo/shell/bulk_api.js:458:48
+mergeBatchResults@src/mongo/shell/bulk_api.js:855:49
+executeBatch@src/mongo/shell/bulk_api.js:919:13
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1163:21
+DBCollection.prototype.insertOne@src/mongo/shell/crud_api.js:264:9
+@(shell):1:
+
+
+> db.students.insertOne( { "name":"prince amit", "year":NumberInt(2019), "major":"Computer Science", "gpa":4, "address":{ "city":"bihar sharif", "street":"habibpura"} })
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5fe2c9dfe5ca4e5cea31e4b0")
+}
+
+
+// if we donot enter the required fields the validation fails
+> db.students.insertOne( { "name":"prince amit", "year":NumberInt(2019), "address":{ "city":"bihar sharif", "street":"habibpura"} })
+WriteError({
+        "index" : 0,
+        "code" : 121,
+        "errmsg" : "Document failed validation",
+        "op" : {
+                "_id" : ObjectId("5fe2ca64e5ca4e5cea31e4b2"),
+                "name" : "prince amit",
+                "year" : NumberInt(2019),
+                "address" : {
+                        "city" : "bihar sharif",
+                        "street" : "habibpura"
+                }
+        }
+}) :
+WriteError({
+        "index" : 0,
+        "code" : 121,
+        "errmsg" : "Document failed validation",
+        "op" : {
+                "_id" : ObjectId("5fe2ca64e5ca4e5cea31e4b2"),
+                "name" : "prince amit",
+                "year" : NumberInt(2019),
+                "address" : {
+                        "city" : "bihar sharif",
+                        "street" : "habibpura"
+                }
+        }
+})
+WriteError@src/mongo/shell/bulk_api.js:458:48
+mergeBatchResults@src/mongo/shell/bulk_api.js:855:49
+executeBatch@src/mongo/shell/bulk_api.js:919:13
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1163:21
+DBCollection.prototype.insertOne@src/mongo/shell/crud_api.js:264:9
+@(shell):1:1
+>

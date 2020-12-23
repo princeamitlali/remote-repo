@@ -1,0 +1,103 @@
+//we use sort to arrange the data points in either asscending or decending order based on some column
+// argument qty is the column based on that whole model or collection is arranges
+// the value 1 means ascending while -1 means decending
+// example of ascending
+// uses single purpose pipeline
+
+
+> db.inventory.find().sort({"qty":1})
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+
+//in decending order
+> db.inventory.find().sort({"qty":-1})
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+
+//you can pick any column
+> db.inventory.find().sort({"item":-1})
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+>
+>
+// skip is used to not show some datapoint from the start points
+// passed argument is the number of datapoint need to skip
+// it is similar to the ofset of mysql
+
+> db.inventory.find()
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+>
+//comparision
+>
+> db.inventory.find().skip(2)
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+>
+
+// if we want to skip item from end we first need to sort them
+> db.inventory.find().sort({"item":1}).skip(2)
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+> db.inventory.find().sort({"item":-1}).skip(2)
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+>
+>
+//limit is similar to the limit of sq1l in which we restrivt the datapoint shown when query will be executed
+
+> db.inventory.find().limit(2)
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+>
+>
+// if we want to limit upside down we have to combine sort
+> db.inventory.find().sort({"item":-1}).limit(2)
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+
+//comparision
+// demostration of therer combination
+> db.inventory.find().sort({"item":-1})
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+>
+>
+> db.inventory.find().sort({"item":-1}).skip(1)
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+>
+>
+> db.inventory.find().sort({"item":-1}).skip(1).limit(2)
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+>

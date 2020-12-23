@@ -1,0 +1,245 @@
+//used to show all available databases
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+
+//created a database named inventory
+> use inventory
+switched to db inventory
+
+//created a model equivalent to the table of mysql
+> db.createCollection('inventory')
+{ "ok" : 1 }
+> show dbs
+admin      0.000GB
+config     0.000GB
+inventory  0.000GB
+local      0.000GB
+test       0.000GB
+
+//inserting records in the table in mongodb we need not to define the schema first the model will be modified automatically according to the inputed database
+//below command is used to insert a single item
+> db.inventory.insertOne({ item:"canvas",qty:100,tags:["cotton"],size: {h:28, w:35.5,uom:"cm"}})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5fe1c9b51fd2da2911d4bbab")
+}
+
+//below comand is used to find the data in the model
+// it is equlivalent to select * from inventory where item="canvas"
+> db.inventory.find({item:"canvas"})
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+
+//we can increase the data presentation by arrange data outputed in a proprer format by appending .pretty()
+> db.inventory.find({item:"canvas"}).pretty()
+{
+        "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"),
+        "item" : "canvas",
+        "qty" : 100,
+        "tags" : [
+                "cotton"
+        ],
+        "size" : {
+                "h" : 28,
+                "w" : 35.5,
+                "uom" : "cm"
+        }
+}
+
+//we can insert many items also with the be;low given syntax
+> db.inventory.insertMany([{}])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5fe1e1951fd2da2911d4bbac")
+        ]
+}
+//example
+> db.inventory.insertMany([
+...    { item: "journal", qty: 25, tags: ["blank", "red"], size: { h: 14, w: 21, uom: "cm" } },
+...    { item: "mat", qty: 85, tags: ["gray"], size: { h: 27.9, w: 35.5, uom: "cm" } },
+...    { item: "mousepad", qty: 25, tags: ["gel", "blue"], size: { h: 19, w: 22.85, uom: "cm" } }
+... ])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5fe1e3671fd2da2911d4bbad"),
+                ObjectId("5fe1e3671fd2da2911d4bbae"),
+                ObjectId("5fe1e3671fd2da2911d4bbaf")
+        ]
+}
+// we can also use db.inventory.inser()  by using this we can add single or multiple data both
+
+> db.inventory.find({"_id":ObjectId("5fe1e3671fd2da2911d4bbad")}).pretty()
+{
+        "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"),
+        "item" : "journal",
+        "qty" : 25,
+        "tags" : [
+                "blank",
+                "red"
+        ],
+        "size" : {
+                "h" : 14,
+                "w" : 21,
+                "uom" : "cm"
+        }
+}
+
+//here we can add data of two diffrent number and diffrent parameters easily without changing the code in below data one new column of status is increased
+> db.inventory.insertMany([
+...    { item: "journal", qty: 25, size: { h: 14, w: 21, uom: "cm" }, status: "A" },
+...    { item: "notebook", qty: 50, size: { h: 8.5, w: 11, uom: "in" }, status: "A" },
+...    { item: "paper", qty: 100, size: { h: 8.5, w: 11, uom: "in" }, status: "D" },
+...    { item: "planner", qty: 75, size: { h: 22.85, w: 30, uom: "cm" }, status: "D" },
+...    { item: "postcard", qty: 45, size: { h: 10, w: 15.25, uom: "cm" }, status: "A" }
+... ])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5fe1e52d1fd2da2911d4bbb0"),
+                ObjectId("5fe1e52d1fd2da2911d4bbb1"),
+                ObjectId("5fe1e52d1fd2da2911d4bbb2"),
+                ObjectId("5fe1e52d1fd2da2911d4bbb3"),
+                ObjectId("5fe1e52d1fd2da2911d4bbb4")
+        ]
+}
+
+//find query worked fine with the modified model
+> db.inventory.find( { status: "D" } )
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+
+
+//quivalent to SELECT * FROM inventory WHERE status in ("A", "D")
+> db.inventory.find( { status: { $in: [ "A", "D" ] } } )
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb0"), "item" : "journal", "qty" : 25, "size" : { "h" : 14, "w" : 21, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb1"), "item" : "notebook", "qty" : 50, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "A" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb4"), "item" : "postcard", "qty" : 45, "size" : { "h" : 10, "w" : 15.25, "uom" : "cm" }, "status" : "A" }
+> db.inventory.find( { status: { $in: [ "A", "D" ] } } )
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb0"), "item" : "journal", "qty" : 25, "size" : { "h" : 14, "w" : 21, "uom" : "cm" }, "status" : "A" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb1"), "item" : "notebook", "qty" : 50, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "A" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb4"), "item" : "postcard", "qty" : 45, "size" : { "h" : 10, "w" : 15.25, "uom" : "cm" }, "status" : "A" }
+>
+// there are several keywords most frequent used are $lt = less than
+//$gt = greater than
+//$lte = less than or equivalent
+//$gte = greater than or equivalent
+//$or = or and manu such more
+// for more details visit mongodb.com  
+//SELECT * FROM inventory WHERE status = "A" AND qty < 30
+> db.inventory.find( { status: "A", qty: { $lt: 30 } } ).pretty()
+{
+        "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb0"),
+        "item" : "journal",
+        "qty" : 25,
+        "size" : {
+                "h" : 14,
+                "w" : 21,
+                "uom" : "cm"
+        },
+        "status" : "A"
+}
+>
+>
+//SELECT * FROM inventory WHERE status = "A" OR qty < 30
+> db.inventory.find( { $or: [ { status: "A" }, { qty: { $lt: 30 } } ] } ).pretty()
+{
+        "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"),
+        "item" : "journal",
+        "qty" : 25,
+        "tags" : [
+                "blank",
+                "red"
+        ],
+        "size" : {
+                "h" : 14,
+                "w" : 21,
+                "uom" : "cm"
+        }
+}
+{
+        "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"),
+        "item" : "mousepad",
+        "qty" : 25,
+        "tags" : [
+                "gel",
+                "blue"
+        ],
+        "size" : {
+                "h" : 19,
+                "w" : 22.85,
+                "uom" : "cm"
+        }
+}
+{
+        "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb0"),
+        "item" : "journal",
+        "qty" : 25,
+        "size" : {
+                "h" : 14,
+                "w" : 21,
+                "uom" : "cm"
+        },
+        "status" : "A"
+}
+{
+        "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb1"),
+        "item" : "notebook",
+        "qty" : 50,
+        "size" : {
+                "h" : 8.5,
+                "w" : 11,
+                "uom" : "in"
+        },
+        "status" : "A"
+}
+{
+        "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb4"),
+        "item" : "postcard",
+        "qty" : 45,
+        "size" : {
+                "h" : 10,
+                "w" : 15.25,
+                "uom" : "cm"
+        },
+        "status" : "A"
+}
+>
+
+//we can update the exsiting data by using update
+//the first argument is update filter and the later one is update action
+// update also comes in three forms 
+//updateOne()
+//updateMany()
+//replaceOne()
+> db.inventory.updateOne({"item":"notebook"},{$set:{"qty":55}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.inventory.findOne({"item":"notebook"})
+{
+        "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb1"),
+        "item" : "notebook",
+        "qty" : 55,
+        "size" : {
+                "h" : 8.5,
+                "w" : 11,
+                "uom" : "in"
+        },
+        "status" : "A"
+}
+
+//the argument is th filter
+//comes in two form for one and for manu
+> db.inventory.deleteOne({"item":"notebook"})
+{ "acknowledged" : true, "deletedCount" : 1 }
+> db.inventory.findOne({"item":"notebook"})
+null
+> db.inventory.deleteMany({"status":"A"})
+{ "acknowledged" : true, "deletedCount" : 2 }
+> db.inventory.find({"status":"A"})
+>
