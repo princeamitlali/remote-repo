@@ -1,0 +1,59 @@
+//indexes in mongodb
+
+//mongodb by default creates an index named as "_id"
+// but if you want to assign any column in as index you can do that by using Index 
+// indexing supports the efficient execution 
+//it is adviced to create index in the begining otherwise the system will generate an error if duplicate data is in the column selected to be an index  
+
+
+> show dbs
+admin      0.000GB
+config     0.000GB
+inventory  0.000GB
+local      0.000GB
+test       0.000GB
+> use inventory
+switched to db inventory
+> db.inventory.find()
+{ "_id" : ObjectId("5fe1c9b51fd2da2911d4bbab"), "item" : "canvas", "qty" : 100, "tags" : [ "cotton" ], "size" : { "h" : 28, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbad"), "item" : "journal", "qty" : 25, "tags" : [ "blank", "red" ], "size" : { "h" : 14, "w" : 21, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbae"), "item" : "mat", "qty" : 85, "tags" : [ "gray" ], "size" : { "h" : 27.9, "w" : 35.5, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e3671fd2da2911d4bbaf"), "item" : "mousepad", "qty" : 25, "tags" : [ "gel", "blue" ], "size" : { "h" : 19, "w" : 22.85, "uom" : "cm" } }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb2"), "item" : "paper", "qty" : 100, "size" : { "h" : 8.5, "w" : 11, "uom" : "in" }, "status" : "D" }
+{ "_id" : ObjectId("5fe1e52d1fd2da2911d4bbb3"), "item" : "planner", "qty" : 75, "size" : { "h" : 22.85, "w" : 30, "uom" : "cm" }, "status" : "D" }
+>
+>
+//this will give all the indexes in the collection 
+
+> db.inventory.getIndexes()
+[ { "v" : 2, "key" : { "_id" : 1 }, "name" : "_id_" } ]
+>
+>
+// this will create the new index to the column passed in the paramenters
+> db.inventory.createIndex({"tags":1})
+{
+        "createdCollectionAutomatically" : false,
+        "numIndexesBefore" : 1,
+        "numIndexesAfter" : 2,
+        "ok" : 1
+}
+>
+>
+> db.inventory.getIndexes()
+[
+        {
+                "v" : 2,
+                "key" : {
+                        "_id" : 1
+                },
+                "name" : "_id_"
+        },
+        {
+                "v" : 2,
+                "key" : {
+                        "tags" : 1
+                },
+                "name" : "tags_1"
+        }
+]
+>
